@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X · fully functional prototype</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background-color: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    /* ===== AUTH SCREENS ===== */
+    .auth-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 24px;
+      background-color: #000000;
+      border-radius: 28px;
+      border: 1px solid #2f3336;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+    }
+    .auth-logo {
+      font-size: 48px;
+      color: #1d9bf0;
+      margin-bottom: 24px;
+    }
+    .auth-title {
+      color: #e7e9ea;
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .auth-sub {
+      color: #71767b;
+      font-size: 15px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    .auth-input {
+      width: 100%;
+      background-color: #1a1a1a;
+      border: 1px solid #2f3336;
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #e7e9ea;
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 14px;
+    }
+    .auth-input::placeholder {
+      color: #71767b;
+    }
+    .auth-input:focus {
+      border-color: #1d9bf0;
+    }
+    .auth-btn {
+      width: 100%;
+      background-color: #1d9bf0;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      border-radius: 40px;
+      padding: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s;
+    }
+    .auth-btn:hover {
+      background-color: #1a8cd8;
+    }
+    .auth-switch {
+      color: #71767b;
+      font-size: 14px;
+      margin-top: 22px;
+      text-align: center;
+    }
+    .auth-switch span {
+      color: #1d9bf0;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .auth-switch span:hover {
+      text-decoration: underline;
+    }
+    .auth-error {
+      color: #f4212e;
+      font-size: 13px;
+      margin-bottom: 10px;
+      min-height: 18px;
+      width: 100%;
+    }
+    .hidden {
+      display: none !important;
+    }
+
+    /* ===== MAIN APP ===== */
+    .app-container {
+      width: 100%;
+      max-width: 1260px;
+      height: 90vh;
+      min-height: 700px;
+      background-color: #000000;
+      border-radius: 28px;
+      border: 1px solid #2f3336;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ---------- LEFT SIDEBAR ---------- */
+    .sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      border-right: 1px solid #2f3336;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      background-color: #000000;
+    }
+    .logo {
+      font-size: 28px;
+      color: #e7e9ea;
+      padding: 10px 16px;
+      margin-bottom: 8px;
+    }
+    .logo i {
+      color: #1d9bf0;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-radius: 30px;
+      color: #e7e9ea;
+      font-size: 19px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.1s;
+      margin-bottom: 2px;
+    }
+    .nav-item i {
+      width: 26px;
+      text-align: center;
+      font-size: 22px;
+    }
+    .nav-item.active {
+      font-weight: 700;
+      color: #e7e9ea;
+      background-color: #181818;
+    }
+    .nav-item:hover {
+      background-color: #181818;
+    }
+    .post-btn {
+      background-color: #1d9bf0;
+      color: white;
+      font-weight: 700;
+      font-size: 17px;
+      text-align: center;
+      padding: 16px;
+      border-radius: 40px;
+      margin: 20px 12px 12px 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .post-btn:hover {
+      background-color: #1a8cd8;
+    }
+    .profile-card {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 40px;
+      cursor: pointer;
+    }
+    .profile-card:hover {
+      background-color: #181818;
+    }
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #1d9bf0, #0a66c2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .profile-info {
+      flex: 1;
+      line-height: 1.3;
+      min-width: 0;
+    }
+    .profile-name {
+      font-weight: 700;
+      color: #e7e9ea;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .profile-handle {
+      color: #71767b;
+      font-size: 14px;
+    }
+    .profile-card i {
+      color: #e7e9ea;
+      font-size: 18px;
+    }
+
+    /* ---------- MAIN FEED ---------- */
+    .feed {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #2f3336;
+      min-width: 0;
+      background-color: #000000;
+    }
+    .feed-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid #2f3336;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .feed-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #e7e9ea;
+    }
+    .top-tabs {
+      display: flex;
+      gap: 24px;
+    }
+    .top-tabs span {
+      color: #71767b;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      padding-bottom: 4px;
+    }
+    .top-tabs span.active {
+      color: #e7e9ea;
+      font-weight: 700;
+      position: relative;
+    }
+    .top-tabs span.active::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: #1d9bf0;
+      border-radius: 3px;
+    }
+
+    /* composer */
+    .composer {
+      display: flex;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid #2f3336;
+      flex-shrink: 0;
+    }
+    .composer-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #1d9bf0, #0a66c2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .composer-body {
+      flex: 1;
+    }
+    .composer-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #e7e9ea;
+      font-size: 17px;
+      outline: none;
+      padding: 10px 0;
+      resize: none;
+      min-height: 52px;
+      font-family: inherit;
+    }
+    .composer-input::placeholder {
+      color: #71767b;
+    }
+    .composer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .composer-icons {
+      display: flex;
+      gap: 14px;
+      color: #1d9bf0;
+      font-size: 18px;
+    }
+    .composer-icons i {
+      cursor: pointer;
+    }
+    .composer-post-btn {
+      background-color: #1d9bf0;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      border-radius: 40px;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .composer-post-btn:hover {
+      background-color: #1a8cd8;
+    }
+    .composer-post-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    /* posts */
+    .posts-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0 0 0;
+      scrollbar-width: thin;
+      scrollbar-color: #2f3336 #000000;
+    }
+    .posts-area::-webkit-scrollbar {
+      width: 5px;
+    }
+    .posts-area::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    .posts-area::-webkit-scrollbar-thumb {
+      background-color: #2f3336;
+      border-radius: 20px;
+    }
+
+    .post {
+      padding: 12px 20px;
+      border-bottom: 1px solid #2f3336;
+      display: flex;
+      gap: 12px;
+      transition: background 0.1s;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .post:hover {
+      background-color: #080808;
+    }
+    .post-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 18px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .post-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .post-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .post-header {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+    .post-name {
+      font-weight: 700;
+      color: #e7e9ea;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .post-name .badge {
+      color: #1d9bf0;
+      font-size: 13px;
+    }
+    .post-handle {
+      color: #71767b;
+      font-size: 14px;
+    }
+    .post-time {
+      color: #71767b;
+      font-size: 14px;
+    }
+    .post-handle::before, .post-time::before {
+      content: '·';
+      margin: 0 4px;
+      color: #71767b;
+    }
+    .post-content {
+      color: #e7e9ea;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+      word-break: break-word;
+    }
+    .post-image {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid #2f3336;
+      margin-bottom: 10px;
+      overflow: hidden;
+      background-color: #1a1a1a;
+    }
+    .post-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+      max-height: 300px;
+      object-fit: cover;
+    }
+    .post-actions {
+      display: flex;
+      gap: 36px;
+      color: #71767b;
+      font-size: 15px;
+      margin-top: 4px;
+    }
+    .post-actions span {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.1s;
+      user-select: none;
+    }
+    .post-actions span:hover {
+      color: #1d9bf0;
+    }
+    .post-actions span.liked {
+      color: #f91880 !important;
+    }
+    .post-actions span.retweeted {
+      color: #00ba7c !important;
+    }
+    .post-actions i {
+      font-size: 15px;
+    }
+
+    /* ---------- RIGHT PANEL ---------- */
+    .right-panel {
+      width: 340px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background-color: #000000;
+    }
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid #2f3336;
+      padding: 0 12px;
+      flex-shrink: 0;
+    }
+    .panel-tab {
+      flex: 1;
+      text-align: center;
+      padding: 14px 0;
+      font-size: 15px;
+      font-weight: 500;
+      color: #71767b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.1s;
+    }
+    .panel-tab.active {
+      color: #e7e9ea;
+      font-weight: 700;
+      border-bottom-color: #1d9bf0;
+    }
+    .panel-tab i {
+      margin-right: 6px;
+      font-size: 15px;
+    }
+    .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: #2f3336 #000000;
+    }
+    .panel-content::-webkit-scrollbar {
+      width: 5px;
+    }
+    .panel-content::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    .panel-content::-webkit-scrollbar-thumb {
+      background-color: #2f3336;
+      border-radius: 20px;
+    }
+
+    /* CHATS */
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #1a1a1a;
+      cursor: pointer;
+    }
+    .chat-item:hover {
+      background-color: #080808;
+    }
+    .chat-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 18px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .chat-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .chat-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .chat-name {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 700;
+      color: #e7e9ea;
+      font-size: 15px;
+    }
+    .chat-name .badge {
+      color: #1d9bf0;
+      font-size: 12px;
+    }
+    .chat-message {
+      color: #71767b;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chat-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .chat-time {
+      color: #71767b;
+      font-size: 12px;
+    }
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #1d9bf0;
+      border-radius: 50%;
+    }
+
+    /* chat view */
+    .chat-view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .chat-view-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #2f3336;
+      margin-bottom: 12px;
+    }
+    .chat-back {
+      color: #1d9bf0;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .chat-view-name {
+      font-weight: 700;
+      color: #e7e9ea;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .chat-view-name .badge {
+      color: #1d9bf0;
+      font-size: 12px;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-bottom: 12px;
+    }
+    .msg-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .msg-row.out {
+      justify-content: flex-end;
+    }
+    .msg-bubble {
+      max-width: 80%;
+      background-color: #1a1a1a;
+      border: 1px solid #2f3336;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      padding: 10px 14px;
+      color: #e7e9ea;
+      font-size: 14px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .msg-row.out .msg-bubble {
+      background-color: #1d9bf0;
+      border: none;
+      color: white;
+      border-radius: 18px;
+      border-bottom-right-radius: 4px;
+      border-bottom-left-radius: 18px;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid #2f3336;
+    }
+    .chat-input-row input {
+      flex: 1;
+      background-color: #1a1a1a;
+      border: 1px solid #2f3336;
+      border-radius: 24px;
+      padding: 10px 16px;
+      color: #e7e9ea;
+      outline: none;
+      font-size: 14px;
+    }
+    .chat-input-row input::placeholder {
+      color: #71767b;
+    }
+    .chat-input-row button {
+      background-color: #1d9bf0;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* AI */
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0 18px 0;
+      border-bottom: 1px solid #1a1a1a;
+      margin-bottom: 16px;
+    }
+    .ai-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1d9bf0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .ai-title {
+      font-weight: 700;
+      color: #e7e9ea;
+      font-size: 17px;
+    }
+    .ai-sub {
+      color: #71767b;
+      font-size: 13px;
+    }
+    .ai-message {
+      background-color: #1a1a1a;
+      border: 1px solid #2f3336;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      color: #e7e9ea;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .ai-message .user {
+      font-weight: 700;
+      color: #1d9bf0;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .ai-message .assistant {
+      font-weight: 700;
+      color: #e7e9ea;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .ai-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .ai-input-row input {
+      flex: 1;
+      background-color: #1a1a1a;
+      border: 1px solid #2f3336;
+      border-radius: 24px;
+      padding: 12px 16px;
+      color: #e7e9ea;
+      outline: none;
+      font-size: 14px;
+    }
+    .ai-input-row input::placeholder {
+      color: #71767b;
+    }
+    .ai-input-row button {
+      background-color: #1d9bf0;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* SETTINGS */
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #1a1a1a;
+      cursor: pointer;
+    }
+    .setting-item i {
+      width: 24px;
+      color: #e7e9ea;
+      font-size: 18px;
+    }
+    .setting-item .setting-text {
+      flex: 1;
+      color: #e7e9ea;
+      font-size: 15px;
+    }
+    .setting-item .setting-value {
+      color: #71767b;
+      font-size: 14px;
+    }
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      background-color: #1d9bf0;
+      border-radius: 20px;
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .toggle-switch.off {
+      background-color: #2f3336;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: white;
+      border-radius: 50%;
+      top: 2px;
+      right: 2px;
+      transition: right 0.2s;
+    }
+    .toggle-switch.off::after {
+      right: 22px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      background-color: transparent;
+      border: 1px solid #f4212e;
+      color: #f4212e;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: 40px;
+      padding: 12px;
+      margin-top: 24px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .logout-btn:hover {
+      background-color: rgba(244, 33, 46, 0.1);
+    }
+
+    .demo-note {
+      font-size: 10px;
+      color: #3e4144;
+      text-align: center;
+      padding: 6px;
+      border-top: 1px solid #1a1a1a;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 80px; align-items: center; padding: 12px 4px; }
+      .sidebar .nav-item span,
+      .sidebar .profile-info,
+      .sidebar .profile-card i,
+      .sidebar .post-btn span { display: none; }
+      .sidebar .nav-item { justify-content: center; padding: 12px; }
+      .sidebar .post-btn { width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; margin: 20px 0 12px 0; border-radius: 50%; }
+      .sidebar .profile-card { justify-content: center; padding: 8px; }
+      .right-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== SIGN IN ========== -->
+<div class="auth-screen" id="signinScreen">
+  <div class="auth-logo"><i class="fab fa-x-twitter"></i></div>
+  <div class="auth-title">Sign in to X</div>
+  <div class="auth-sub">Welcome back. It's happening.</div>
+  <div class="auth-error" id="signinError"></div>
+  <input class="auth-input" id="signinUser" type="text" placeholder="Username or email" autocomplete="off">
+  <input class="auth-input" id="signinPass" type="password" placeholder="Password" autocomplete="off">
+  <button class="auth-btn" id="signinBtn">Sign in</button>
+  <div class="auth-switch">
+    Don't have an account? <span id="goSignup">Sign up</span>
+  </div>
+</div>
+
+<!-- ========== SIGN UP ========== -->
+<div class="auth-screen hidden" id="signupScreen">
+  <div class="auth-logo"><i class="fab fa-x-twitter"></i></div>
+  <div class="auth-title">Create your account</div>
+  <div class="auth-sub">Join the conversation.</div>
+  <div class="auth-error" id="signupError"></div>
+  <input class="auth-input" id="signupName" type="text" placeholder="Display name" autocomplete="off">
+  <input class="auth-input" id="signupUser" type="text" placeholder="Username (e.g. johndoe)" autocomplete="off">
+  <input class="auth-input" id="signupPass" type="password" placeholder="Password (min 4 chars)" autocomplete="off">
+  <button class="auth-btn" id="signupBtn">Sign up</button>
+  <div class="auth-switch">
+    Already have an account? <span id="goSignin">Sign in</span>
+  </div>
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<div class="app-container hidden" id="appContainer">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo"><i class="fab fa-x-twitter"></i></div>
+
+    <div class="nav-item active" data-view="home"><i class="fas fa-home"></i> <span>Home</span></div>
+    <div class="nav-item" data-view="explore"><i class="fas fa-search"></i> <span>Explore</span></div>
+    <div class="nav-item" data-view="notifications"><i class="fas fa-bell"></i> <span>Notifications</span></div>
+    <div class="nav-item" data-view="messages"><i class="fas fa-envelope"></i> <span>Messages</span></div>
+    <div class="nav-item" data-view="bookmarks"><i class="fas fa-bookmark"></i> <span>Bookmarks</span></div>
+    <div class="nav-item" data-view="profile"><i class="fas fa-user"></i> <span>Profile</span></div>
+    <div class="nav-item" data-view="more"><i class="fas fa-ellipsis-h"></i> <span>More</span></div>
+
+    <div class="post-btn" id="sidebarPostBtn"><span>Post</span></div>
+
+    <div class="profile-card" id="sidebarProfile">
+      <div class="profile-avatar" id="sidebarAvatar">?</div>
+      <div class="profile-info">
+        <div class="profile-name" id="sidebarName">User</div>
+        <div class="profile-handle" id="sidebarHandle">@user</div>
+      </div>
+      <i class="fas fa-ellipsis-h"></i>
+    </div>
+  </div>
+
+  <!-- FEED -->
+  <div class="feed">
+    <div class="feed-header">
+      <h1 id="feedTitle">Home</h1>
+      <div class="top-tabs" id="feedTabs">
+        <span class="active" data-tab="foryou">For you</span>
+        <span data-tab="following">Following</span>
+      </div>
+    </div>
+
+    <div class="composer" id="composer">
+      <div class="composer-avatar" id="composerAvatar">?</div>
+      <div class="composer-body">
+        <textarea class="composer-input" id="composerInput" placeholder="What is happening?!" rows="1"></textarea>
+        <div class="composer-actions">
+          <div class="composer-icons">
+            <i class="far fa-image" title="Add image"></i>
+            <i class="far fa-smile" title="Add emoji"></i>
+            <i class="fas fa-map-marker-alt" title="Add location"></i>
+          </div>
+          <button class="composer-post-btn" id="composerPostBtn" disabled>Post</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="posts-area" id="postsArea"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="panel-tabs">
+      <div class="panel-tab active" data-panel="chats"><i class="fas fa-comment-dots"></i> Chats</div>
+      <div class="panel-tab" data-panel="ai"><i class="fas fa-robot"></i> AI</div>
+      <div class="panel-tab" data-panel="settings"><i class="fas fa-cog"></i> Settings</div>
+    </div>
+    <div class="panel-content" id="panelContent"></div>
+    <div class="demo-note">demo · fully functional front-end</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ========== STORAGE / AUTH ==========
+  const USERS_KEY = 'xapp_users_v2';
+  const SESSION_KEY = 'xapp_session_v2';
+
+  function getUsers() {
+    try {
+      const raw = localStorage.getItem(USERS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  }
+  function saveUsers(users) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  }
+  function setSession(user) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  }
+  function getSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+  function clearSession() {
+    localStorage.removeItem(SESSION_KEY);
+  }
+
+  let currentUser = null;
+
+  // ========== POSTS DATA ==========
+  const POSTS = [
+    { id:1, name:'Reuters', handle:'@Reuters', badge:true, time:'12m', content:'BREAKING: Global climate summit reaches historic agreement on carbon emissions. 195 nations commit to net-zero by 2040.', image:'https://images.unsplash.com/photo-1569163139394-de4e4f43e4e3?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:32000, retweets:8400, comments:2100 },
+    { id:2, name:'Meme Lord', handle:'@memelord', badge:true, time:'28m', content:"My code doesn't have bugs, it has randomly generated features. 🐛✨", image:'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=350&fit=crop', avatarColor:'#f57c00', likes:5600, retweets:1200, comments:432 },
+    { id:3, name:'ESPN FC', handle:'@ESPNFC', badge:true, time:'45m', content:'🚨 Real Madrid win their 15th Champions League title after a dramatic 3-2 extra-time victory! 🏆⚪', image:'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&h=350&fit=crop', avatarColor:'#c62828', likes:98000, retweets:24000, comments:12300 },
+    { id:4, name:'TechCrunch', handle:'@TechCrunch', badge:true, time:'1h', content:'OpenAI announces GPT-5 with real-time reasoning and 10x context window. Available to Plus subscribers next week. 🤖', image:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=350&fit=crop', avatarColor:'#1d9bf0', likes:76000, retweets:18000, comments:5600 },
+    { id:5, name:'Foodie Heaven', handle:'@foodieheaven', badge:false, time:'1h', content:'Just tried the viral 72-hour fermented pizza dough. The crunch is UNREAL. 🍕🔥 Recipe below 👇', image:'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&h=350&fit=crop', avatarColor:'#f9a825', likes:14000, retweets:2300, comments:890 },
+    { id:6, name:'NatGeo', handle:'@NatGeo', badge:true, time:'2h', content:'Rare footage of a snow leopard and her cubs in the Himalayas. Conservation efforts are paying off. 🐆❄️', image:'https://images.unsplash.com/photo-1602491453631-e2a5ad90a131?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:45000, retweets:6700, comments:1100 },
+    { id:7, name:'BBC World', handle:'@BBCWorld', badge:true, time:'2h', content:'Japan launches new high-speed maglev train connecting Tokyo and Osaka in just 67 minutes. 🚄', image:'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:52000, retweets:9100, comments:3400 },
+    { id:8, name:'Daily Banter', handle:'@dailybanter', badge:false, time:'3h', content:"Me: I'll sleep early tonight. Also me at 3am watching a documentary about the history of staplers. 📎", image:null, avatarColor:'#f57c00', likes:18000, retweets:3200, comments:567 },
+    { id:9, name:'NBA', handle:'@NBA', badge:true, time:'3h', content:'LeBron James becomes the first player in NBA history to reach 40,000 career points. 👑🏀', image:'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=350&fit=crop', avatarColor:'#c62828', likes:120000, retweets:15000, comments:8900 },
+    { id:10, name:'The Verge', handle:'@verge', badge:true, time:'4h', content:"Apple's foldable iPhone prototype leaks — 7.8-inch display, titanium hinge, expected 2026. 📱", image:'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=350&fit=crop', avatarColor:'#1d9bf0', likes:67000, retweets:11000, comments:4200 },
+    { id:11, name:'Sushi Master', handle:'@sushimaster', badge:false, time:'4h', content:'The secret to perfect sushi rice: rinse 5 times, cook with kombu, season with red vinegar. 🍣🥢', image:'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=600&h=350&fit=crop', avatarColor:'#f9a825', likes:8900, retweets:1100, comments:234 },
+    { id:12, name:'Earth Pics', handle:'@earthpics', badge:false, time:'5h', content:"Iceland's newest volcanic eruption captured from a drone. Nature's fireworks. 🌋🇮🇸", image:'https://images.unsplash.com/photo-1551244072-5d12893278ab?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:29000, retweets:4500, comments:678 },
+    { id:13, name:'Al Jazeera', handle:'@AJEnglish', badge:true, time:'5h', content:'EU passes landmark AI regulation act — companies must disclose training data and ensure human oversight.', image:null, avatarColor:'#2e7d32', likes:34000, retweets:7600, comments:2800 },
+    { id:14, name:'Shitpost Central', handle:'@shitpost', badge:false, time:'6h', content:'"You up?" — my brain at 2am asking me to solve the mystery of why we exist. 🧠🌌', image:null, avatarColor:'#f57c00', likes:21000, retweets:2700, comments:345 },
+    { id:15, name:'Tennis Channel', handle:'@TennisChannel', badge:true, time:'7h', content:'Carlos Alcaraz wins his 3rd Grand Slam title at just 21 years old. The future is now. 🎾🏆', image:'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=600&h=350&fit=crop', avatarColor:'#c62828', likes:38000, retweets:5400, comments:1900 },
+    { id:16, name:'SpaceX', handle:'@SpaceX', badge:true, time:'8h', content:'Starship completes first successful orbital flight and booster landing. Mars is getting closer. 🚀🌌', image:'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=600&h=350&fit=crop', avatarColor:'#1d9bf0', likes:210000, retweets:32000, comments:15000 },
+    { id:17, name:'World Food Programme', handle:'@WFP', badge:true, time:'9h', content:'Zero hunger is possible. New report shows global food insecurity dropped 12% this year thanks to coordinated aid. 🌾', image:'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:23000, retweets:6800, comments:1200 },
+    { id:18, name:'Formula 1', handle:'@F1', badge:true, time:'10h', content:'LIGHTS OUT! The 2026 season opener delivered 47 overtakes — a new record. 🏎️💨', image:'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&h=350&fit=crop', avatarColor:'#c62828', likes:87000, retweets:19000, comments:6700 },
+    { id:19, name:'Nature Is Lit', handle:'@natureislit', badge:false, time:'11h', content:'Bioluminescent waves lighting up the California coast. Nature is truly magical. 🌊✨', image:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:41000, retweets:8200, comments:1100 },
+    { id:20, name:'Google DeepMind', handle:'@GoogleDeepMind', badge:true, time:'12h', content:'AlphaFold 3 predicts protein structures with 95% accuracy — accelerating drug discovery worldwide. 🧬', image:'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&h=350&fit=crop', avatarColor:'#1d9bf0', likes:64000, retweets:14000, comments:3100 },
+    { id:21, name:'Barstool Sports', handle:'@barstoolsports', badge:false, time:'13h', content:'Aaron Rodgers just threw a Hail Mary... in a preseason game... and completed it. The man is not human. 🏈', image:'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=600&h=350&fit=crop', avatarColor:'#c62828', likes:27000, retweets:6100, comments:8900 },
+    { id:22, name:'Chef Gordon', handle:'@chefgordon', badge:false, time:'14h', content:'Pro tip: never salt your pasta water like the sea. Salt it like your grandmother would — with love. 🍝', image:'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=600&h=350&fit=crop', avatarColor:'#f9a825', likes:34000, retweets:5100, comments:2300 },
+    { id:23, name:'The Onion', handle:'@TheOnion', badge:true, time:'15h', content:'Man Spends 45 Minutes Choosing Netflix Show To Fall Asleep To In 5 Minutes. 📺😴', image:null, avatarColor:'#f57c00', likes:56000, retweets:12000, comments:3400 },
+    { id:24, name:'UN Environment', handle:'@UNEP', badge:true, time:'16h', content:'Renewable energy now provides 42% of global electricity — a record high. The transition is accelerating. ☀️💨', image:'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:31000, retweets:9800, comments:2200 },
+    { id:25, name:'AWS', handle:'@awscloud', badge:true, time:'17h', content:'Introducing new Graviton5 chips — 40% faster and 60% more energy efficient. The cloud just got greener. ☁️💚', image:'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=350&fit=crop', avatarColor:'#1d9bf0', likes:19000, retweets:4400, comments:1500 },
+    { id:26, name:'NPR', handle:'@NPR', badge:true, time:'18h', content:'New study: 20 minutes of daily walking reduces risk of heart disease by 30%. Get those steps in! 🚶‍♀️❤️', image:'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:42000, retweets:8900, comments:3100 },
+    { id:27, name:'Wired', handle:'@WIRED', badge:true, time:'19h', content:'Inside the race to build the world\'s first practical quantum computer. The future is entangled. ⚛️', image:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&h=350&fit=crop', avatarColor:'#1d9bf0', likes:28000, retweets:6200, comments:1800 },
+    { id:28, name:'Bourdain Archive', handle:'@bourdainarchive', badge:false, time:'20h', content:'"Context and memory play powerful roles in all the truly great meals in one\'s life." — Anthony Bourdain 🍜', image:'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&h=350&fit=crop', avatarColor:'#f9a825', likes:76000, retweets:18000, comments:2900 },
+    { id:29, name:'UEFA', handle:'@UEFA', badge:true, time:'21h', content:'Women\'s Euro 2026 breaks all attendance records — 1.2 million fans across the tournament. 🏟️⚽', image:'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&h=350&fit=crop', avatarColor:'#c62828', likes:44000, retweets:9800, comments:5400 },
+    { id:30, name:'BBC Earth', handle:'@BBCEarth', badge:true, time:'22h', content:'New species of deep-sea octopus discovered near Antarctica. Scientists say it glows in the dark. 🐙✨', image:'https://images.unsplash.com/photo-1545671913-b89ac1b4ac10?w=600&h=350&fit=crop', avatarColor:'#2e7d32', likes:58000, retweets:13000, comments:2100 }
+  ];
+
+  // Track user-created posts + interactions
+  let userPosts = [];
+  let likedIds = new Set();
+  let retweetedIds = new Set();
+
+  // ========== DOM HELPERS ==========
+  const $ = (id) => document.getElementById(id);
+  const signinScreen = $('signinScreen');
+  const signupScreen = $('signupScreen');
+  const appContainer = $('appContainer');
+
+  function show(el) { el.classList.remove('hidden'); }
+  function hide(el) { el.classList.add('hidden'); }
+
+  // ========== AUTH FLOW ==========
+  function showSignin() {
+    hide(signupScreen);
+    show(signinScreen);
+    $('signinError').textContent = '';
+    $('signinUser').value = '';
+    $('signinPass').value = '';
+  }
+  function showSignup() {
+    hide(signinScreen);
+    show(signupScreen);
+    $('signupError').textContent = '';
+    $('signupName').value = '';
+    $('signupUser').value = '';
+    $('signupPass').value = '';
+  }
+
+  // SIGN IN
+  $('signinBtn').addEventListener('click', function() {
+    const user = $('signinUser').value.trim().toLowerCase();
+    const pass = $('signinPass').value;
+    const errorEl = $('signinError');
+
+    if (!user || !pass) {
+      errorEl.textContent = 'Please enter username and password.';
+      return;
+    }
+    const users = getUsers();
+    const found = users.find(u => 
+      (u.username.toLowerCase() === user || u.email?.toLowerCase() === user) && u.password === pass
+    );
+    if (!found) {
+      errorEl.textContent = 'Invalid username or password. Try signing up.';
+      return;
+    }
+    errorEl.textContent = '';
+    currentUser = {
+      name: found.name,
+      handle: '@' + found.username,
+      avatarLetter: found.name.charAt(0).toUpperCase()
+    };
+    setSession(currentUser);
+    enterApp();
+  });
+
+  // SIGN UP
+  $('signupBtn').addEventListener('click', function() {
+    const name = $('signupName').value.trim();
+    const username = $('signupUser').value.trim().toLowerCase().replace(/^@/, '');
+    const pass = $('signupPass').value;
+    const errorEl = $('signupError');
+
+    if (!name || !username || !pass) {
+      errorEl.textContent = 'Please fill in all fields.';
+      return;
+    }
+    if (username.length < 3) {
+      errorEl.textContent = 'Username must be at least 3 characters.';
+      return;
+    }
+    if (pass.length < 4) {
+      errorEl.textContent = 'Password must be at least 4 characters.';
+      return;
+    }
+    const users = getUsers();
+    if (users.some(u => u.username.toLowerCase() === username)) {
+      errorEl.textContent = 'Username already taken. Try another.';
+      return;
+    }
+    const newUser = { name, username, password: pass, email: '' };
+    users.push(newUser);
+    saveUsers(users);
+
+    errorEl.textContent = '';
+    currentUser = {
+      name: newUser.name,
+      handle: '@' + newUser.username,
+      avatarLetter: newUser.name.charAt(0).toUpperCase()
+    };
+    setSession(currentUser);
+    enterApp();
+  });
+
+  // Switch screens
+  $('goSignup').addEventListener('click', showSignup);
+  $('goSignin').addEventListener('click', showSignin);
+
+  // Enter key support
+  $('signinPass').addEventListener('keydown', e => { if (e.key === 'Enter') $('signinBtn').click(); });
+  $('signupPass').addEventListener('keydown', e => { if (e.key === 'Enter') $('signupBtn').click(); });
+
+  // ========== APP ENTRY ==========
+  function enterApp() {
+    hide(signinScreen);
+    hide(signupScreen);
+    show(appContainer);
+
+    // Set user UI
+    $('sidebarName').textContent = currentUser.name;
+    $('sidebarHandle').textContent = currentUser.handle;
+    $('sidebarAvatar').textContent = currentUser.avatarLetter;
+    $('composerAvatar').textContent = currentUser.avatarLetter;
+
+    renderPosts();
+    renderPanel('chats');
+    setActiveNav('home');
+  }
+
+  // Auto-login if session exists
+  function checkSession() {
+    const s = getSession();
+    if (s && s.name && s.handle) {
+      currentUser = s;
+      enterApp();
+    } else {
+      showSignin();
+    }
+  }
+
+  // ========== POSTS RENDERING ==========
+  function formatCount(n) {
+    if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+    return String(n);
+  }
+
+  function getAvatarStyle(color, name) {
+    return `background: linear-gradient(145deg, ${color}, ${shadeColor(color, -20)});`;
+  }
+  function shadeColor(color, percent) {
+    let R = parseInt(color.substring(1,3),16);
+    let G = parseInt(color.substring(3,5),16);
+    let B = parseInt(color.substring(5,7),16);
+    R = parseInt(R * (100 + percent) / 100); R = (R<255)?R:255;
+    G = parseInt(G * (100 + percent) / 100); G = (G<255)?G:255;
+    B = parseInt(B * (100 + percent) / 100); B = (B<255)?B:255;
+    return "#" + ((1<<24) + (R<<16) + (G<<8) + B).toString(16).slice(1);
+  }
+
+  function renderPosts() {
+    const container = $('postsArea');
+    container.innerHTML = '';
+    const allPosts = [...userPosts, ...POSTS];
+
+    allPosts.forEach(post => {
+      const postEl = document.createElement('div');
+      postEl.className = 'post';
+      postEl.dataset.postId = post.id;
+
+      const isLiked = likedIds.has(post.id);
+      const isRetweeted = retweetedIds.has(post.id);
+
+      let imageHTML = '';
+      if (post.image) {
+        imageHTML = `<div class="post-image"><img src="${post.image}" alt="post image" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`;
+      }
+
+      // Post avatar — use image if it's the current user's post
+      let avatarHTML;
+      if (post.isCurrentUser) {
+        avatarHTML = `<div class="post-avatar" style="background: linear-gradient(145deg, #1d9bf0, #0a66c2);">${currentUser.avatarLetter}</div>`;
+      } else {
+        avatarHTML = `<div class="post-avatar" style="${getAvatarStyle(post.avatarColor || '#1d9bf0')}">${post.name.charAt(0)}</div>`;
+      }
+
+      const badgeHTML = post.badge ? '<i class="fas fa-certificate badge"></i>' : '';
+
+      postEl.innerHTML = `
+        ${avatarHTML}
+        <div class="post-body">
+          <div class="post-header">
+            <span class="post-name">${escapeHtml(post.name)} ${badgeHTML}</span>
+            <span class="post-handle">${escapeHtml(post.handle)}</span>
+            <span class="post-time">${escapeHtml(post.time)}</span>
+          </div>
+          <div class="post-content">${escapeHtml(post.content)}</div>
+          ${imageHTML}
+          <div class="post-actions">
+            <span class="action-comment"><i class="far fa-comment"></i> ${formatCount(post.comments || 0)}</span>
+            <span class="action-retweet ${isRetweeted ? 'retweeted' : ''}"><i class="fas fa-retweet"></i> ${formatCount(post.retweets + (isRetweeted ? 1 : 0))}</span>
+            <span class="action-like ${isLiked ? 'liked' : ''}"><i class="${isLiked ? 'fas' : 'far'} fa-heart"></i> ${formatCount(post.likes + (isLiked ? 1 : 0))}</span>
+            <span class="action-share"><i class="fas fa-chart-bar"></i> ${formatCount(Math.floor(post.likes * 20))}</span>
+          </div>
+        </div>
+      `;
+
+      // Wire up interaction buttons
+      const likeBtn = postEl.querySelector('.action-like');
+      const rtBtn = postEl.querySelector('.action-retweet');
+
+      likeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (likedIds.has(post.id)) {
+          likedIds.delete(post.id);
+          likeBtn.classList.remove('liked');
+          likeBtn.innerHTML = `<i class="far fa-heart"></i> ${formatCount(post.likes)}`;
+        } else {
+          likedIds.add(post.id);
+          likeBtn.classList.add('liked');
+          likeBtn.innerHTML = `<i class="fas fa-heart"></i> ${formatCount(post.likes + 1)}`;
+        }
+      });
+
+      rtBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (retweetedIds.has(post.id)) {
+          retweetedIds.delete(post.id);
+          rtBtn.classList.remove('retweeted');
+          rtBtn.innerHTML = `<i class="fas fa-retweet"></i> ${formatCount(post.retweets)}`;
+        } else {
+          retweetedIds.add(post.id);
+          rtBtn.classList.add('retweeted');
+          rtBtn.innerHTML = `<i class="fas fa-retweet"></i> ${formatCount(post.retweets + 1)}`;
+        }
+      });
+
+      container.appendChild(postEl);
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function(m) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m];
+    });
+  }
+
+  // ========== COMPOSER ==========
+  const composerInput = $('composerInput');
+  const composerPostBtn = $('composerPostBtn');
+
+  composerInput.addEventListener('input', function() {
+    composerPostBtn.disabled = composerInput.value.trim().length === 0;
+    composerInput.style.height = 'auto';
+    composerInput.style.height = Math.min(composerInput.scrollHeight, 120) + 'px';
+  });
+
+  function submitPost() {
+    const text = composerInput.value.trim();
+    if (!text) return;
+    const newPost = {
+      id: Date.now(),
+      name: currentUser.name,
+      handle: currentUser.handle,
+      badge: false,
+      time: 'now',
+      content: text,
+      image: null,
+      avatarColor: '#1d9bf0',
+      likes: 0,
+      retweets: 0,
+      comments: 0,
+      isCurrentUser: true
+    };
+    userPosts.unshift(newPost);
+    composerInput.value = '';
+    composerInput.style.height = 'auto';
+    composerPostBtn.disabled = true;
+    renderPosts();
+    // scroll to top
+    $('postsArea').scrollTop = 0;
+  }
+
+  composerPostBtn.addEventListener('click', submitPost);
+  composerInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitPost();
+    }
+  });
+
+  // Sidebar post button focuses composer
+  $('sidebarPostBtn').addEventListener('click', function() {
+    composerInput.focus();
+  });
+
+  // ========== NAVIGATION ==========
+  function setActiveNav(view) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const el = document.querySelector(`.nav-item[data-view="${view}"]`);
+    if (el) el.classList.add('active');
+  }
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const view = this.dataset.view;
+      setActiveNav(view);
+      $('feedTitle').textContent = this.textContent.trim();
+
+      if (view === 'messages') {
+        switchPanel('chats');
+      } else if (view === 'home' || view === 'explore') {
+        renderPosts();
+      }
+      // Other views just show the feed (prototype)
+    });
+  });
+
+  // Feed tabs
+  document.querySelectorAll('#feedTabs span').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('#feedTabs span').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      // Prototype: same feed
+    });
+  });
+
+  // ========== RIGHT PANEL ==========
+  let currentPanel = 'chats';
+  let currentChat = null;
+
+  function switchPanel(panel) {
+    currentPanel = panel;
+    document.querySelectorAll('.panel-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.panel === panel);
+    });
+    renderPanel(panel);
+  }
+
+  document.querySelectorAll('.panel-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      switchPanel(this.dataset.panel);
+    });
+  });
+
+  // Chat data
+  const CHATS = [
+    { id:'elon', name:'Elon Musk', handle:'@elonmusk', badge:true, avatarColor:'#1d9bf0', lastMsg:'Let\'s ship it to Mars 🚀', time:'2m', unread:true,
+      messages:[
+        { out:false, text:'Hey! Just saw the prototype. Looks 🔥' },
+        { out:true, text:'Thanks! Built it with pure HTML/CSS.' },
+        { out:false, text:"Clean UI. Very X-like. But where's the edit button? 👀" },
+        { out:true, text:'Haha, maybe in v2.' },
+        { out:false, text:"Nice. Let's ship it to Mars 🚀" },
+        { out:true, text:'🚀🔥 ready when you are.' }
+      ]
+    },
+    { id:'sarah', name:'Sarah Chen', handle:'@sarahc', badge:true, avatarColor:'#f57c00', lastMsg:'Sent you the design files 📎', time:'15m', unread:true,
+      messages:[
+        { out:false, text:'Hey, did you see the new mockups?' },
+        { out:true, text:'Not yet, sending them over?' },
+        { out:false, text:'Sent you the design files 📎' }
+      ]
+    },
+    { id:'tech', name:'Tech Group', handle:'3 members', badge:false, avatarColor:'#2e7d32', lastMsg:'Alex: GPT-5 is wild', time:'1h', unread:false,
+      messages:[
+        { out:false, text:'Alex: GPT-5 is wild 🤯' },
+        { out:true, text:'I know right?' },
+        { out:false, text:'Sam: Can\'t wait to test it' }
+      ]
+    },
+    { id:'mama', name:'Mama', handle:'@mama', badge:false, avatarColor:'#c62828', lastMsg:'Call me when you can ❤️', time:'3h', unread:false,
+      messages:[
+        { out:false, text:'Call me when you can ❤️' }
+      ]
+    }
+  ];
+
+  function renderPanel(panel) {
+    const pc = $('panelContent');
+    pc.innerHTML = '';
+
+    if (panel === 'chats') {
+      if (currentChat) {
+        renderChatView(pc, currentChat);
+      } else {
+        renderChatList(pc);
+      }
+    } else if (panel === 'ai') {
+      renderAI(pc);
+    } else if (panel === 'settings') {
+      renderSettings(pc);
+    }
+  }
+
+  function renderChatList(pc) {
+    CHATS.forEach(chat => {
+      const el = document.createElement('div');
+      el.className = 'chat-item';
+      el.innerHTML = `
+        <div class="chat-avatar" style="${getAvatarStyle(chat.avatarColor)}">${chat.name.charAt(0)}</div>
+        <div class="chat-info">
+          <div class="chat-name">${escapeHtml(chat.name)} ${chat.badge ? '<i class="fas fa-certificate badge"></i>' : ''}</div>
+          <div class="chat-message">${escapeHtml(chat.lastMsg)}</div>
+        </div>
+        <div class="chat-meta">
+          <span class="chat-time">${chat.time}</span>
+          ${chat.unread ? '<div class="unread-dot"></div>' : ''}
+        </div>
+      `;
+      el.addEventListener('click', () => {
+        currentChat = chat;
+        chat.unread = false;
+        renderPanel('chats');
+      });
+      pc.appendChild(el);
+    });
+  }
+
+  function renderChatView(pc, chat) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'chat-view';
+    wrapper.innerHTML = `
+      <div class="chat-view-header">
+        <i class="fas fa-arrow-left chat-back"></i>
+        <div class="chat-view-name">${escapeHtml(chat.name)} ${chat.badge ? '<i class="fas fa-certificate badge"></i>' : ''}</div>
+      </div>
+      <div class="chat-messages"></div>
+      <div class="chat-input-row">
+        <input type="text" placeholder="Start a new message" class="chat-input-field">
+        <button class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    `;
+    const msgContainer = wrapper.querySelector('.chat-messages');
+    chat.messages.forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'msg-row' + (m.out ? ' out' : '');
+      row.innerHTML = `<div class="msg-bubble">${escapeHtml(m.text)}</div>`;
+      msgContainer.appendChild(row);
+    });
+
+    wrapper.querySelector('.chat-back').addEventListener('click', () => {
+      currentChat = null;
+      renderPanel('chats');
+    });
+
+    const input = wrapper.querySelector('.chat-input-field');
+    const sendBtn = wrapper.querySelector('.chat-send-btn');
+    function send() {
+      const text = input.value.trim();
+      if (!text) return;
+      chat.messages.push({ out:true, text });
+      chat.lastMsg = text;
+      renderPanel('chats');
+      setTimeout(() => {
+        const newInput = $('panelContent').querySelector('.chat-input-field');
+        if (newInput) newInput.focus();
+      }, 50);
+    }
+    sendBtn.addEventListener('click', send);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+    pc.appendChild(wrapper);
+    setTimeout(() => msgContainer.scrollTop = msgContainer.scrollHeight, 30);
+  }
+
+  // AI
+  let aiMessages = [
+    { role:'assistant', text:"Hi! I'm Grok-style AI. Ask me anything about this prototype or anything else." }
+  ];
+
+  function renderAI(pc) {
+    pc.innerHTML = `
+      <div class="ai-header">
+        <div class="ai-icon"><i class="fas fa-robot"></i></div>
+        <div>
+          <div class="ai-title">AI Assistant</div>
+          <div class="ai-sub">Powered by demo · always online</div>
+        </div>
+      </div>
+      <div class="ai-messages"></div>
+      <div class="ai-input-row">
+        <input type="text" class="ai-input" placeholder="Ask anything...">
+        <button class="ai-send"><i class="fas fa-arrow-up"></i></button>
+      </div>
+    `;
+    const container = pc.querySelector('.ai-messages');
+    aiMessages.forEach(m => {
+      const el = document.createElement('div');
+      el.className = 'ai-message';
+      el.innerHTML = `<div class="${m.role}">${m.role === 'user' ? 'You' : 'AI'}</div>${escapeHtml(m.text)}`;
+      container.appendChild(el);
+    });
+
+    const input = pc.querySelector('.ai-input');
+    const sendBtn = pc.querySelector('.ai-send');
+    function sendAI() {
+      const text = input.value.trim();
+      if (!text) return;
+      aiMessages.push({ role:'user', text });
+      input.value = '';
+      // fake AI reply
+      const replies = [
+        "Interesting question! In this prototype, everything is front-end only. But I can still chat with you. 😊",
+        "That's a great point. X's real algorithm would optimize for engagement, but this demo just shows the UI.",
+        "I'd recommend trying the sign-up flow first, then post something and like a few posts. The toggles in Settings also work!",
+        "Fun fact: the images in the feed come from Unsplash. They're loaded live from the web.",
+        "You can log out and log back in — your session persists via localStorage. Try creating a new account!"
+      ];
+      const reply = replies[Math.floor(Math.random() * replies.length)];
+      setTimeout(() => {
+        aiMessages.push({ role:'assistant', text: reply });
+        renderPanel('ai');
+      }, 400);
+      renderPanel('ai');
+    }
+    sendBtn.addEventListener('click', sendAI);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') sendAI(); });
+    setTimeout(() => container.scrollTop = container.scrollHeight, 30);
+  }
+
+  // Settings
+  const settingsState = {
+    darkMode: true,
+    notifications: true,
+    privateAccount: false
+  };
+
+  function renderSettings(pc) {
+    pc.innerHTML = `
+      <div class="setting-item">
+        <i class="fas fa-user"></i>
+        <span class="setting-text">Account</span>
+        <span class="setting-value">${escapeHtml(currentUser.handle)}</span>
+      </div>
+      <div class="setting-item">
+        <i class="fas fa-lock"></i>
+        <span class="setting-text">Private account</span>
+        <div class="toggle-switch ${settingsState.privateAccount ? '' : 'off'}" data-setting="privateAccount"></div>
+      </div>
+      <div class="setting-item">
+        <i class="fas fa-bell"></i>
+        <span class="setting-text">Push notifications</span>
+        <div class="toggle-switch ${settingsState.notifications ? '' : 'off'}" data-setting="notifications"></div>
+      </div>
+      <div class="setting-item">
+        <i class="fas fa-moon"></i>
+        <span class="setting-text">Dark mode</span>
+        <div class="toggle-switch ${settingsState.darkMode ? '' : 'off'}" data-setting="darkMode"></div>
+      </div>
+      <div class="setting-item">
+        <i class="fas fa-shield-alt"></i>
+        <span class="setting-text">Security</span>
+        <span class="setting-value">2FA on</span>
+      </div>
+      <div class="setting-item">
+        <i class="fas fa-question-circle"></i>
+        <span class="setting-text">Help center</span>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Log out</button>
+    `;
+
+    pc.querySelectorAll('.toggle-switch').forEach(t => {
+      t.addEventListener('click', function() {
+        const key = this.dataset.setting;
+        settingsState[key] = !settingsState[key];
+        this.classList.toggle('off', !settingsState[key]);
+      });
+    });
+
+    pc.querySelector('#logoutBtn').addEventListener('click', function() {
+      clearSession();
+      currentUser = null;
+      currentChat = null;
+      likedIds.clear();
+      retweetedIds.clear();
+      userPosts = [];
+      hide(appContainer);
+      showSignin();
+    });
+  }
+
+  // ========== INITIALIZE
